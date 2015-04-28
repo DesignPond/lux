@@ -1,0 +1,10 @@
+{
+    "require": {
+        "slim/slim": "~2.0",
+        "illuminate/database": "4.1",
+        "entomb/slim-json-api": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.*"
+    }
+}
