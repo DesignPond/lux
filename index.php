@@ -22,6 +22,10 @@ include 'Service/Jwt.php';
 include 'Service/Abo.php';
 include 'Service/Event.php';
 
+// Users
+include 'Models/User.php';
+include 'Models/Address.php';
+
 // App instance
 $app = new Slim\Slim(array('mode' => 'development'));
 
@@ -40,16 +44,21 @@ $ipAuth = function() use ($app)
     }
 };
 
-/*
+/* *************************************
  * Routes
- */
+ ************************************** */
 
+/*
+ * Denied access page
+ * */
 $app->get('/denied', function() use ($app) {
-
     $app->render(403, array('error' => TRUE,'msg' => 'Vous n\'avez pas access'));
-
 });
 
+/*
+ * Abonnement numero
+ * Test if user has an abo
+ * */
 $app->get('/abonnement/:numero', $ipAuth ,function($numero) use ($app) {
 
     $abo   = new Abo();
@@ -60,6 +69,10 @@ $app->get('/abonnement/:numero', $ipAuth ,function($numero) use ($app) {
 
 });
 
+/*
+ * Events
+ * Filters by archive, name, organisateurs
+ * */
 $app->get('/event', $ipAuth ,function() use ($app) {
 
     $actif    = (isset($_GET['archive']) ? false : true);
@@ -76,12 +89,49 @@ $app->get('/event', $ipAuth ,function() use ($app) {
 
 });
 
+/*
+ * Event
+ * Get event with infos
+ * */
 $app->get('/event/:id', $ipAuth ,function($id) use ($app) {
 
     $event    = new Event();
     $colloque = $event->getEvent($id);
 
     $data['data'] = $colloque->toArray();
+    $app->render(200, $data);
+
+});
+
+/*
+ * Abo Users
+ * Broadcast users to see if new ones exist
+ * */
+$app->get('/users', $ipAuth ,function() use ($app) {
+
+    $abo   = new Abo();
+
+    $users = $abo->getAllUsers();
+    $all   = $abo->usersHaveEmail($users);
+
+    $data['data'] = $all->toArray();
+
+    $app->render(200, $data);
+
+});
+
+/*
+ * Abo User
+ * Get one user by numero
+ * */
+$app->get('/user/:numero', $ipAuth ,function($numero) use ($app) {
+
+    $abo  = new Abo();
+
+    $user = $abo->getUser($numero);
+
+    $data['data'] = $user->toArray();
+
     $app->render(200, $data);
 
 });
