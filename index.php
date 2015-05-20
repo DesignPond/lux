@@ -25,6 +25,7 @@ include 'Service/Event.php';
 // Users
 include 'Models/User.php';
 include 'Models/Address.php';
+include 'Models/Auth.php';
 
 // App instance
 $app = new Slim\Slim(array('mode' => 'development'));
@@ -129,6 +130,24 @@ $app->get('/user/:numero', $ipAuth ,function($numero) use ($app) {
     $abo  = new Abo();
 
     $user = $abo->getUser($numero);
+
+    $data['data'] = $user->toArray();
+
+    $app->render(200, $data);
+
+});
+
+/*
+ * Authenticate User
+ * By email and password
+ * */
+$app->get('/auth/:email/:password', $ipAuth ,function($email,$password) use ($app) {
+
+    $auth  = new Auth();
+
+    $password = $auth->simple_decrypt($password);
+
+    $user    = $auth->authUser($email,$password);
 
     $data['data'] = $user->toArray();
 
