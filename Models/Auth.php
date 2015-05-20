@@ -14,7 +14,6 @@ class Auth{
     public function authUser($email,$password){
 
         return $this->user->where('email','=',$email)->where('password','=',$password)->select('fe_users.uid','fe_users.email','fe_users.gender','fe_users.first_name','fe_users.last_name')->get();
-
     }
 
     function simple_encrypt($text)

@@ -57,20 +57,6 @@ $app->get('/denied', function() use ($app) {
 });
 
 /*
- * Abonnement numero
- * Test if user has an abo
- * */
-$app->get('/abonnement/:numero', $ipAuth ,function($numero) use ($app) {
-
-    $abo   = new Abo();
-    $last  = $abo->aboIspayedForUser($numero);
-    $payed = ($last ? $last->toArray() : array());
-
-    $app->render(200, array('data' => $payed));
-
-});
-
-/*
  * Events
  * Filters by archive, name, organisateurs
  * */
@@ -101,6 +87,37 @@ $app->get('/event/:id', $ipAuth ,function($id) use ($app) {
 
     $data['data'] = $colloque->toArray();
     $app->render(200, $data);
+
+});
+
+/*
+ * Abonnement numero
+ * Test if user has an abo
+ * */
+$app->get('/abonnement/:numero', $ipAuth ,function($numero) use ($app) {
+
+    $abo   = new Abo();
+    $last  = $abo->aboIspayedForUser($numero);
+    $payed = ($last ? $last->toArray() : array());
+    $data  = array();
+
+    if($payed)
+    {
+        $user = $abo->getUser($numero);
+        $user = $user->first();
+
+        if(!empty($user->user)){
+            $name =  $user->user->first_name.' '.$user->user->last_name;
+        }
+
+        if(!empty($user->address)){
+            $name =  $user->address->first_name.' '.$user->address->last_name;
+        }
+
+        $data = array_merge($payed,array('name' => $name));
+    }
+
+    $app->render(200, array('data' => $data));
 
 });
 
@@ -147,7 +164,12 @@ $app->get('/auth/:email/:password', $ipAuth ,function($email,$password) use ($ap
 
     $password = $auth->simple_decrypt($password);
 
-    $user    = $auth->authUser($email,$password);
+    $user     = $auth->authUser($email,$password);
+
+    if(!$user->isEmpty())
+    {
+        $user = $user->first();
+    }
 
     $data['data'] = $user->toArray();
 
