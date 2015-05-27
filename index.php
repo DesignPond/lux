@@ -68,6 +68,7 @@ $app->get('/event', $ipAuth ,function() use ($app) {
 
     $event  = new Event();
     $events = $event->getAllEvents($actif,$name);
+
     $actifs = $event->dispatchEvents($events->toArray(), $centres);
 
     $data['data'] = (!empty($actifs) ? $actifs : array());

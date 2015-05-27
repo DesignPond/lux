@@ -19,7 +19,7 @@ class Abo{
 
     public function getAboUserRjn($numero,$rjn){
 
-        $payed = Rjn_payement::where('numero','=',$numero)->where('rjn','=',$rjn)->get();
+        $payed = Rjn_payement::where('numero','=',$numero)->where('rappel','=',0)->where('rjn','=',$rjn)->get();
 
         if(!$payed->isEmpty())
         {

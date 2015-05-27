@@ -86,6 +86,8 @@ class Event{
 
         $organisateurs = (!empty($event['centre_logos']) ? $event['centre_logos'] : array());
 
+        $centres = array_map('strtolower', $centres);
+
         if(!empty($organisateurs))
         {
             $organisateurs = explode(',', $organisateurs);
