@@ -75,5 +75,17 @@ class Reader{
         return $data;
     }
 
+    public function createExcel($data)
+    {
+        $objPHPExcel = PHPExcel_IOFactory::load($this->path.'usersToAdd.xlsx');
+        $objPHPExcel->setActiveSheetIndex(0);
+        $row = $objPHPExcel->getActiveSheet()->getHighestRow()+1;
+
+        $objPHPExcel->getActiveSheet()->fromArray($data, NULL, 'A'.$row);
+
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, "Excel2007");
+        $objWriter->save($this->path.'usersToAdd.xlsx');
+    }
+
 }	
 	

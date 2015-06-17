@@ -29,23 +29,49 @@
     <div class="col-md-12">
         <h1>Import</h1>
 
-        <form action="{{ $request_uri }}" class="form-inline" method="post" enctype="multipart/form-data">
+        <form action="{{ $request_uri }}" class="form-horizontal" method="post" enctype="multipart/form-data">
             <div class="well">
                 <div class="form-group">
-                    <label for="exampleInputFile">Fichier excel</label>
-                    <input type="file" name="file">
+                    <label class="col-sm-2 control-label" for="exampleInputFile">Fichier excel</label>
+                    <div class="col-sm-6">
+                        <input type="file" name="file">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="exampleInputFile">Spécialisations</label>
+                    <div class="col-sm-6">
+                        <select name="specialisation" class="form-control">
+                            <option value="">Choisir</option>
+                            @if(!empty($specialisations))
+                                @foreach($specialisations as $id_specialisation => $specialisation)
+                                    <option value="{{ $id_specialisation }}">{{ $specialisation }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label" for="exampleInputFile">Membres</label>
+                    <div class="col-sm-6">
+                        <select name="membre" class="form-control">
+                            <option value="">Choisir</option>
+                            @if(!empty($membres))
+                                @foreach($membres as $id_membre => $membre)
+                                    <option value="{{ $id_membre }}">{{ $membre }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
                 </div>
             </div>
             <button type="submit" class="btn btn-info">Submit</button>
         </form>
 
-        @if(!empty($results))
-            <?php
-                echo '<pre>';
-                print_r($results);
-                echo '</pre>';
-            ?>
-        @endif
+        <?php
+        echo '<pre>';
+        print_r($results);
+        echo '</pre>';
+        ?>
 
     </div>
 

@@ -86,36 +86,61 @@ $app->get('/error/:message', function($message) use ($app) {
     echo $message;
 });
 
+$app->get('/add', function() use ($app) {
+
+/*    $user   = new Models\User();
+    $search = new Service\Search();
+    $search->addSpecialisation(710, 8);
+    $thea = $user->where('uid','=',710)->with(array('specialisation'))->get()->first();
+    echo '<pre>';
+    print_r($thea->specialisation->lists('id_Specialisation'));
+    echo '</pre>';exit;*/
+    $reader  = new Service\Reader();
+
+    $data = array(
+        array(1,2,34,5),
+        array(62,34,75,76)
+    );
+
+    $reader->createExcel($data);
+});
+
 $app->map('/upload', function() use ($app) {
 
     $results = array();
-    $new     = array();
+    $users   = array();
 
     $reader  = new Service\Reader();
     $search  = new Service\Search();
+
     $specialisation = new Models\Specialisation();
+    $membre        = new Models\Membre();
+
+    $specialisations = $specialisation->all()->lists('TitreSpecialisation','id_Specialisation');
+    $membres         = $membre->all()->lists('TitreMembre','id_Membre');
+
+    if(isset($_POST['specialisation']) && !empty($_POST['specialisation']))
+    {
+        $search->setSpecialisation($_POST['specialisation']);
+    }
+
+    if(isset($_POST['membre']) && !empty($_POST['membre']))
+    {
+        $search->setMembre($_POST['membre']);
+    }
 
     if(isset($_FILES['file']))
     {
         $results = $reader->uploadFile()->readFile();
-
-        if(!empty($results))
-        {
-            foreach($results as $line => $result)
-            {
-                $params['first_name'] = $result[2];
-                $params['last_name']  = $result[3];
-                $params['email']      = $result[4];
-
-                $new[$line][] = $search->searchUser($params);
-            }
-        }
+        $users   = $search->search($results);
     }
 
     $data = array(
-        'request_uri' => $_SERVER['REQUEST_URI'],
-        'upload_uri'  => 'doUpload',
-        'results'     => $new
+        'request_uri'     => $_SERVER['REQUEST_URI'],
+        'upload_uri'      => 'doUpload',
+        'results'         => $users,
+        'specialisations' => $specialisations,
+        'membres'         => $membres
     );
 
     $app->render('upload',$data);
