@@ -27,13 +27,33 @@ include 'Models/User.php';
 include 'Models/Address.php';
 include 'Models/Auth.php';
 
-// App instance
-$app = new Slim\Slim(array('mode' => 'development'));
+// Upload and reader
+//include 'Service/Upload.php';
+//include 'Service/Reader.php';
 
-// Load json middleware
-$app->view(new \JsonApiView());
-$app->add(new \JsonApiMiddleware());
-//$app->config('debug', false); // avoid render error in html
+use Service\Upload;
+use Service\Reader;
+
+// App instance
+$app = new Slim\Slim(
+    array(
+        'mode' => 'development',
+        'templates.path' => './views',
+        'view'  => new \Slim\Views\Blade()
+    )
+);
+
+$view = $app->view();
+$view->parserOptions = array(
+    'debug' => true,
+    'cache' => dirname(__FILE__) . '/cache'
+);
+
+function APIrequest(){
+    $app = \Slim\Slim::getInstance();
+    $app->view(new \JsonApiView());
+    $app->add(new \JsonApiMiddleware());
+}
 
 $ipAuth = function() use ($app)
 {
@@ -46,13 +66,91 @@ $ipAuth = function() use ($app)
 };
 
 /* *************************************
- * Routes
+ * Routes simple
+ ************************************** */
+
+// and define the engine used for the view @see http://twig.sensiolabs.org
+/*
+$app->view = new \Slim\Views\Twig();
+$app->view->setTemplatesDirectory("views");
+
+// Twig configuration
+$view = $app->view();
+$view->parserOptions = array('debug' => true);
+$view->parserExtensions = array(new \Slim\Views\TwigExtension());*/
+
+/*
+ * Error upload
+ * */
+$app->get('/error/:message', function($message) use ($app) {
+    echo $message;
+});
+
+$app->map('/upload', function() use ($app) {
+
+    $results = array();
+    $new     = array();
+
+    $reader  = new Service\Reader();
+    $search  = new Service\Search();
+    $specialisation = new Models\Specialisation();
+
+    if(isset($_FILES['file']))
+    {
+        $results = $reader->uploadFile()->readFile();
+
+        if(!empty($results))
+        {
+            foreach($results as $line => $result)
+            {
+                $params['first_name'] = $result[2];
+                $params['last_name']  = $result[3];
+                $params['email']      = $result[4];
+
+                $new[$line][] = $search->searchUser($params);
+            }
+        }
+    }
+
+    $data = array(
+        'request_uri' => $_SERVER['REQUEST_URI'],
+        'upload_uri'  => 'doUpload',
+        'results'     => $new
+    );
+
+    $app->render('upload',$data);
+
+})->via('GET', 'POST');
+
+
+$app->get('/read', function() use ($app) {
+
+    $data = array();
+
+    $app->render('read.php',$data);
+
+});
+
+$app->post('/doUpload', function() use ($app) {
+
+    $upload  = new Upload();
+
+    if(isset($_POST['file'])){
+
+    }
+
+    return $app->redirect('/');
+
+});
+
+/* *************************************
+ * Routes API JSON
  ************************************** */
 
 /*
  * Denied access page
  * */
-$app->get('/denied', function() use ($app) {
+$app->get('/denied', 'APIrequest', function() use ($app) {
     $app->render(403, array('error' => TRUE,'msg' => 'Vous n\'avez pas access'));
 });
 
@@ -60,7 +158,7 @@ $app->get('/denied', function() use ($app) {
  * Events
  * Filters by archive, name, organisateurs
  * */
-$app->get('/event', $ipAuth ,function() use ($app) {
+$app->get('/event', 'APIrequest', $ipAuth ,function() use ($app) {
 
     $actif    = (isset($_GET['archive']) ? false : true);
     $name     = (isset($_GET['name']) ? $_GET['name'] : null);
@@ -81,7 +179,7 @@ $app->get('/event', $ipAuth ,function() use ($app) {
  * Event
  * Get event with infos
  * */
-$app->get('/event/:id', $ipAuth ,function($id) use ($app) {
+$app->get('/event/:id', 'APIrequest',  $ipAuth ,function($id) use ($app) {
 
     $event    = new Event();
     $colloque = $event->getEvent($id);
@@ -95,7 +193,7 @@ $app->get('/event/:id', $ipAuth ,function($id) use ($app) {
  * Abonnement numero
  * Test if user has an abo
  * */
-$app->get('/abonnement/:numero', $ipAuth ,function($numero) use ($app) {
+$app->get('/abonnement/:numero', 'APIrequest', $ipAuth ,function($numero) use ($app) {
 
     $abo   = new Abo();
     $last  = $abo->aboIspayedForUser($numero);
@@ -126,7 +224,7 @@ $app->get('/abonnement/:numero', $ipAuth ,function($numero) use ($app) {
  * Abo Users
  * Broadcast users to see if new ones exist
  * */
-$app->get('/users', $ipAuth ,function() use ($app) {
+$app->get('/users', 'APIrequest', $ipAuth ,function() use ($app) {
 
     $abo   = new Abo();
 
@@ -143,7 +241,7 @@ $app->get('/users', $ipAuth ,function() use ($app) {
  * Abo User
  * Get one user by numero
  * */
-$app->get('/user/:numero', $ipAuth ,function($numero) use ($app) {
+$app->get('/user/:numero', 'APIrequest', $ipAuth ,function($numero) use ($app) {
 
     $abo  = new Abo();
 
@@ -159,7 +257,7 @@ $app->get('/user/:numero', $ipAuth ,function($numero) use ($app) {
  * Authenticate User
  * By email and password
  * */
-$app->get('/auth/:email/:password', $ipAuth ,function($email,$password) use ($app) {
+$app->get('/auth/:email/:password', 'APIrequest', $ipAuth ,function($email,$password) use ($app) {
 
     $auth  = new Auth();
 
