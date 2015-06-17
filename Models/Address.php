@@ -1,6 +1,6 @@
-<?php
+<?php namespace Models;
 
-class Address extends Illuminate\Database\Eloquent\Model {
+class Address extends \Illuminate\Database\Eloquent\Model {
     public $timestamps    = false;
     protected $table      = 'tt_address';
     protected $fillable   = array(

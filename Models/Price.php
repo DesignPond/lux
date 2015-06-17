@@ -1,6 +1,6 @@
-<?php
+<?php namespace Models;
 
-class Price extends Illuminate\Database\Eloquent\Model {
+class Price extends \Illuminate\Database\Eloquent\Model {
     public $timestamps    = false;
     protected $table      = 'prix';
     protected $primaryKey = 'id_Prix';

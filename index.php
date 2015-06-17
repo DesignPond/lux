@@ -2,7 +2,7 @@
 
 require 'vendor/autoload.php';
 include 'database.php';
-
+/*
 // Events
 include 'Models/File.php';
 include 'Models/Colloque.php';
@@ -25,7 +25,7 @@ include 'Service/Event.php';
 // Users
 include 'Models/User.php';
 include 'Models/Address.php';
-include 'Models/Auth.php';
+include 'Models/Auth.php';*/
 
 // Upload and reader
 //include 'Service/Upload.php';
@@ -33,6 +33,10 @@ include 'Models/Auth.php';
 
 use Service\Upload;
 use Service\Reader;
+use Service\Event;
+use Service\Abo;
+use Models\Auth;
+use Models\User;
 
 // App instance
 $app = new Slim\Slim(
@@ -114,7 +118,7 @@ $app->map('/upload', function() use ($app) {
     $search  = new Service\Search();
 
     $specialisation = new Models\Specialisation();
-    $membre        = new Models\Membre();
+    $membre         = new Models\Membre();
 
     $specialisations = $specialisation->all()->lists('TitreSpecialisation','id_Specialisation');
     $membres         = $membre->all()->lists('TitreMembre','id_Membre');
@@ -268,7 +272,7 @@ $app->get('/users', 'APIrequest', $ipAuth ,function() use ($app) {
  * */
 $app->get('/user/:numero', 'APIrequest', $ipAuth ,function($numero) use ($app) {
 
-    $abo  = new Abo();
+    $abo  = new Service\Abo();
 
     $user = $abo->getUser($numero);
 

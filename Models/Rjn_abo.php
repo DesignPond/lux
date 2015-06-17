@@ -1,6 +1,6 @@
-<?php
+<?php namespace Models;
 
-class Rjn_abo extends Illuminate\Database\Eloquent\Model {
+class Rjn_abo extends \Illuminate\Database\Eloquent\Model {
     public $timestamps    = false;
     protected $table      = 'abo_rjn';
     protected $fillable   = array(
