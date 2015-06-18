@@ -11,9 +11,9 @@ class Search{
 
     public function __construct()
     {
-        $this->user = new User();
+        $this->user    = new User();
         $this->specialisation = null;
-        $this->membre = null;
+        $this->membre  = null;
         $this->reader  = new \App\Service\Reader();
     }
 

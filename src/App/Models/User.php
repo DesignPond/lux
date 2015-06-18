@@ -11,11 +11,11 @@ class User extends \Illuminate\Database\Eloquent\Model {
 
     public function specialisation()
     {
-        return $this->belongsToMany('\Models\Specialisation', 'specialisationusers', 'refUser', 'refSorteSpecialisation');
+        return $this->belongsToMany('\App\Models\Specialisation', 'specialisationusers', 'refUser', 'refSorteSpecialisation');
     }
 
     public function member()
     {
-        return $this->belongsToMany('\Models\Membre', 'membreuser', 'refUser', 'refSorteMembre');
+        return $this->belongsToMany('\App\Models\Membre', 'membreuser', 'refUser', 'refSorteMembre');
     }
 }

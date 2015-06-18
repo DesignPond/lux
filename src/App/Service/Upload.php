@@ -13,7 +13,7 @@ class Upload{
 
     public function __construct()
     {
-        $this->uploadDir = __DIR__.'/../csv';
+        $this->uploadDir = dirname(dirname(dirname(dirname(__FILE__)))).'/csv/';
     }
 
     public function doUpload()

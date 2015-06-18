@@ -17,10 +17,9 @@ class Reader{
     public function __construct()
     {
         $this->phpexcel = new PHPExcel();
-        $this->path     = 'csv/';
+        $this->base_url = ($_SERVER['HTTP_HOST'] == 'lux.local' ? 'http://lux.local' : 'http://www.publications-droit.ch/fileadmin/lux');
+        $this->path     = dirname(dirname(dirname(dirname(__FILE__)))).'/csv/';
         $this->uploader = new Upload();
-
-        $this->base_url = ($_SERVER['HTTP_HOST'] == 'http://lux.local' ? 'http://lux.local' : 'http://www.publications-droit.ch/fileadmin/lux');
     }
 
     public function uploadFile()
