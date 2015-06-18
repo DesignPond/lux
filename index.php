@@ -37,7 +37,7 @@ $app->add(new \JsonApiMiddleware());
 
 $ipAuth = function() use ($app)
 {
-    $granted = array('194.126.200.59','127.0.0.1','130.125.41.184');
+    $granted = array('194.126.200.59','127.0.0.1','130.125.41.184','178.192.238.140');
 
     if(!in_array($_SERVER['REMOTE_ADDR'],$granted))
     {
@@ -98,24 +98,23 @@ $app->get('/event/:id', $ipAuth ,function($id) use ($app) {
 $app->get('/abonnement/:numero', $ipAuth ,function($numero) use ($app) {
 
     $abo   = new Abo();
-    $last  = $abo->aboIspayedForUser($numero);
-    $payed = ($last ? $last->toArray() : array());
     $data  = array();
 
-    if($payed)
+    $user = $abo->getUser($numero);
+    $user = $user->first();
+
+    if($abo->aboIsActive($user))
     {
-        $user = $abo->getUser($numero);
-        $user = $user->first();
-
-        if(!empty($user->user)){
-            $name =  $user->user->first_name.' '.$user->user->last_name;
+        if (!empty($user->user)) {
+            $name = $user->user->first_name . ' ' . $user->user->last_name;
         }
 
-        if(!empty($user->address)){
-            $name =  $user->address->first_name.' '.$user->address->last_name;
+        if (!empty($user->address)) {
+            $name = $user->address->first_name . ' ' . $user->address->last_name;
         }
 
-        $data = array_merge($payed,array('name' => $name));
+        $data = $user->toArray();
+        $data = array_merge($data, array('name' => $name));
     }
 
     $app->render(200, array('data' => $data));
