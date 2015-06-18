@@ -31,13 +31,6 @@ include 'Models/Auth.php';*/
 //include 'Service/Upload.php';
 //include 'Service/Reader.php';
 
-use Service\Upload;
-use Service\Reader;
-use Service\Event;
-use Service\Abo;
-use Models\Auth;
-use Models\User;
-
 // App instance
 $app = new Slim\Slim(
     array(
@@ -99,7 +92,7 @@ $app->get('/add', function() use ($app) {
     echo '<pre>';
     print_r($thea->specialisation->lists('id_Specialisation'));
     echo '</pre>';exit;*/
-    $reader  = new Service\Reader();
+    $reader  = new \App\Service\Reader();
 
     $data = array(
         array(1,2,34,5),
@@ -114,11 +107,11 @@ $app->map('/upload', function() use ($app) {
     $results = array();
     $users   = array();
 
-    $reader  = new Service\Reader();
-    $search  = new Service\Search();
+    $reader  = new \App\Service\Reader();
+    $search  = new \App\Service\Search();
 
-    $specialisation = new Models\Specialisation();
-    $membre         = new Models\Membre();
+    $specialisation = new \App\Models\Specialisation();
+    $membre         = new \App\Models\Membre();
 
     $specialisations = $specialisation->all()->lists('TitreSpecialisation','id_Specialisation');
     $membres         = $membre->all()->lists('TitreMembre','id_Membre');
@@ -162,7 +155,7 @@ $app->get('/read', function() use ($app) {
 
 $app->post('/doUpload', function() use ($app) {
 
-    $upload  = new Upload();
+    $upload  = new \App\Service\Upload();
 
     if(isset($_POST['file'])){
 
@@ -193,7 +186,7 @@ $app->get('/event', 'APIrequest', $ipAuth ,function() use ($app) {
     $name     = (isset($_GET['name']) ? $_GET['name'] : null);
     $centres  = (isset($_GET['centres']) ? $_GET['centres'] : array());
 
-    $event  = new Event();
+    $event  = new \App\Service\Event();
     $events = $event->getAllEvents($actif,$name);
 
     $actifs = $event->dispatchEvents($events->toArray(), $centres);
@@ -210,7 +203,7 @@ $app->get('/event', 'APIrequest', $ipAuth ,function() use ($app) {
  * */
 $app->get('/event/:id', 'APIrequest',  $ipAuth ,function($id) use ($app) {
 
-    $event    = new Event();
+    $event    = new \App\Service\Event();
     $colloque = $event->getEvent($id);
 
     $data['data'] = $colloque->toArray();
@@ -224,7 +217,7 @@ $app->get('/event/:id', 'APIrequest',  $ipAuth ,function($id) use ($app) {
  * */
 $app->get('/abonnement/:numero', 'APIrequest', $ipAuth ,function($numero) use ($app) {
 
-    $abo   = new Abo();
+    $abo   = new \App\Service\Abo();
     $data  = array();
 
     $user = $abo->getUser($numero);
@@ -254,7 +247,7 @@ $app->get('/abonnement/:numero', 'APIrequest', $ipAuth ,function($numero) use ($
  * */
 $app->get('/users', 'APIrequest', $ipAuth ,function() use ($app) {
 
-    $abo   = new Abo();
+    $abo   = new \App\Service\Abo();
 
     $users = $abo->getAllUsers();
     $all   = $abo->usersHaveEmail($users);
@@ -271,7 +264,7 @@ $app->get('/users', 'APIrequest', $ipAuth ,function() use ($app) {
  * */
 $app->get('/user/:numero', 'APIrequest', $ipAuth ,function($numero) use ($app) {
 
-    $abo  = new Service\Abo();
+    $abo  = new \App\Service\Abo();
 
     $user = $abo->getUser($numero);
 
@@ -287,10 +280,9 @@ $app->get('/user/:numero', 'APIrequest', $ipAuth ,function($numero) use ($app) {
  * */
 $app->get('/auth/:email/:password', 'APIrequest', $ipAuth ,function($email,$password) use ($app) {
 
-    $auth  = new Auth();
+    $auth  = new \App\Service\Auth();
 
     $password = $auth->simple_decrypt($password);
-
     $user     = $auth->authUser($email,$password);
 
     if(!$user->isEmpty())

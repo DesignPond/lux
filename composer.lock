@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "b64fa706cbd98fb0a5aa83e54f755e45",
+    "hash": "065fe82c9d02096792e6a4e3a8e6a8cc",
     "packages": [
         {
             "name": "clickcoder/slim-blade",
@@ -1801,13 +1801,13 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": {
         "entomb/slim-json-api": 20,
         "gargron/fileupload": 20,
         "clickcoder/slim-blade": 20
     },
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": []

@@ -15,8 +15,9 @@
     "autoload": {
         "psr-0": {
             "PHPExcel": "Classes/",
-            "Service": "",
-            "Models": ""
+            "App": "src"
         }
-    }
+    },
+   "minimum-stability": "dev",
+   "prefer-stable": true
 }

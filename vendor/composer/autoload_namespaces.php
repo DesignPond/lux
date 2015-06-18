@@ -10,10 +10,8 @@ return array(
     'Twig_' => array($vendorDir . '/twig/twig/lib'),
     'Symfony\\Component\\Finder\\' => array($vendorDir . '/symfony/finder'),
     'Slim' => array($vendorDir . '/slim/slim'),
-    'Service' => array($baseDir . '/'),
     'Prophecy\\' => array($vendorDir . '/phpspec/prophecy/src'),
     'PHPExcel' => array($baseDir . '/Classes', $vendorDir . '/phpoffice/phpexcel/Classes'),
-    'Models' => array($baseDir . '/'),
     'Illuminate\\View' => array($vendorDir . '/illuminate/view'),
     'Illuminate\\Support' => array($vendorDir . '/illuminate/support'),
     'Illuminate\\Filesystem' => array($vendorDir . '/illuminate/filesystem'),
@@ -22,4 +20,5 @@ return array(
     'Illuminate\\Container' => array($vendorDir . '/illuminate/container'),
     'FileUpload\\' => array($vendorDir . '/gargron/fileupload/src'),
     'Carbon' => array($vendorDir . '/nesbot/carbon/src'),
+    'App' => array($baseDir . '/src'),
 );
