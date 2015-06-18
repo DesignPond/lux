@@ -1,4 +1,9 @@
-<?php
+<?php namespace Service;
+
+use Models\Rjn_abo;
+use Models\Product;
+use Models\Rjn_payement;
+
 class Abo{
 
     public function getLastRjnYear(){

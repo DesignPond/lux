@@ -1,10 +1,22 @@
 {
     "require": {
         "slim/slim": "~2.0",
+        "slim/views": "~0.1",
+        "twig/twig": "~1.0",
         "illuminate/database": "4.1",
-        "entomb/slim-json-api": "dev-master"
+        "entomb/slim-json-api": "dev-master",
+        "phpoffice/phpexcel": "1.8.0",
+        "gargron/fileupload": "dev-master#f01842387f054e0c67e23c8213c8e7b42f3d6179",
+        "clickcoder/slim-blade": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "4.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "PHPExcel": "Classes/",
+            "Service": "",
+            "Models": ""
+        }
     }
 }

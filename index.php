@@ -2,7 +2,7 @@
 
 require 'vendor/autoload.php';
 include 'database.php';
-
+/*
 // Events
 include 'Models/File.php';
 include 'Models/Colloque.php';
@@ -25,15 +25,39 @@ include 'Service/Event.php';
 // Users
 include 'Models/User.php';
 include 'Models/Address.php';
-include 'Models/Auth.php';
+include 'Models/Auth.php';*/
+
+// Upload and reader
+//include 'Service/Upload.php';
+//include 'Service/Reader.php';
+
+use Service\Upload;
+use Service\Reader;
+use Service\Event;
+use Service\Abo;
+use Models\Auth;
+use Models\User;
 
 // App instance
-$app = new Slim\Slim(array('mode' => 'development'));
+$app = new Slim\Slim(
+    array(
+        'mode' => 'development',
+        'templates.path' => './views',
+        'view'  => new \Slim\Views\Blade()
+    )
+);
 
-// Load json middleware
-$app->view(new \JsonApiView());
-$app->add(new \JsonApiMiddleware());
-//$app->config('debug', false); // avoid render error in html
+$view = $app->view();
+$view->parserOptions = array(
+    'debug' => true,
+    'cache' => dirname(__FILE__) . '/cache'
+);
+
+function APIrequest(){
+    $app = \Slim\Slim::getInstance();
+    $app->view(new \JsonApiView());
+    $app->add(new \JsonApiMiddleware());
+}
 
 $ipAuth = function() use ($app)
 {
@@ -46,13 +70,116 @@ $ipAuth = function() use ($app)
 };
 
 /* *************************************
- * Routes
+ * Routes simple
+ ************************************** */
+
+// and define the engine used for the view @see http://twig.sensiolabs.org
+/*
+$app->view = new \Slim\Views\Twig();
+$app->view->setTemplatesDirectory("views");
+
+// Twig configuration
+$view = $app->view();
+$view->parserOptions = array('debug' => true);
+$view->parserExtensions = array(new \Slim\Views\TwigExtension());*/
+
+/*
+ * Error upload
+ * */
+$app->get('/error/:message', function($message) use ($app) {
+    echo $message;
+});
+
+$app->get('/add', function() use ($app) {
+
+/*    $user   = new Models\User();
+    $search = new Service\Search();
+    $search->addSpecialisation(710, 8);
+    $thea = $user->where('uid','=',710)->with(array('specialisation'))->get()->first();
+    echo '<pre>';
+    print_r($thea->specialisation->lists('id_Specialisation'));
+    echo '</pre>';exit;*/
+    $reader  = new Service\Reader();
+
+    $data = array(
+        array(1,2,34,5),
+        array(62,34,75,76)
+    );
+
+    $reader->createExcel($data);
+});
+
+$app->map('/upload', function() use ($app) {
+
+    $results = array();
+    $users   = array();
+
+    $reader  = new Service\Reader();
+    $search  = new Service\Search();
+
+    $specialisation = new Models\Specialisation();
+    $membre         = new Models\Membre();
+
+    $specialisations = $specialisation->all()->lists('TitreSpecialisation','id_Specialisation');
+    $membres         = $membre->all()->lists('TitreMembre','id_Membre');
+
+    if(isset($_POST['specialisation']) && !empty($_POST['specialisation']))
+    {
+        $search->setSpecialisation($_POST['specialisation']);
+    }
+
+    if(isset($_POST['membre']) && !empty($_POST['membre']))
+    {
+        $search->setMembre($_POST['membre']);
+    }
+
+    if(isset($_FILES['file']))
+    {
+        $results = $reader->uploadFile()->readFile();
+        $users   = $search->search($results);
+    }
+
+    $data = array(
+        'request_uri'     => $_SERVER['REQUEST_URI'],
+        'upload_uri'      => 'doUpload',
+        'results'         => $users,
+        'specialisations' => $specialisations,
+        'membres'         => $membres
+    );
+
+    $app->render('upload',$data);
+
+})->via('GET', 'POST');
+
+
+$app->get('/read', function() use ($app) {
+
+    $data = array();
+
+    $app->render('read.php',$data);
+
+});
+
+$app->post('/doUpload', function() use ($app) {
+
+    $upload  = new Upload();
+
+    if(isset($_POST['file'])){
+
+    }
+
+    return $app->redirect('/');
+
+});
+
+/* *************************************
+ * Routes API JSON
  ************************************** */
 
 /*
  * Denied access page
  * */
-$app->get('/denied', function() use ($app) {
+$app->get('/denied', 'APIrequest', function() use ($app) {
     $app->render(403, array('error' => TRUE,'msg' => 'Vous n\'avez pas access'));
 });
 
@@ -60,7 +187,7 @@ $app->get('/denied', function() use ($app) {
  * Events
  * Filters by archive, name, organisateurs
  * */
-$app->get('/event', $ipAuth ,function() use ($app) {
+$app->get('/event', 'APIrequest', $ipAuth ,function() use ($app) {
 
     $actif    = (isset($_GET['archive']) ? false : true);
     $name     = (isset($_GET['name']) ? $_GET['name'] : null);
@@ -81,7 +208,7 @@ $app->get('/event', $ipAuth ,function() use ($app) {
  * Event
  * Get event with infos
  * */
-$app->get('/event/:id', $ipAuth ,function($id) use ($app) {
+$app->get('/event/:id', 'APIrequest',  $ipAuth ,function($id) use ($app) {
 
     $event    = new Event();
     $colloque = $event->getEvent($id);
@@ -95,7 +222,7 @@ $app->get('/event/:id', $ipAuth ,function($id) use ($app) {
  * Abonnement numero
  * Test if user has an abo
  * */
-$app->get('/abonnement/:numero', $ipAuth ,function($numero) use ($app) {
+$app->get('/abonnement/:numero', 'APIrequest', $ipAuth ,function($numero) use ($app) {
 
     $abo   = new Abo();
     $data  = array();
@@ -125,7 +252,7 @@ $app->get('/abonnement/:numero', $ipAuth ,function($numero) use ($app) {
  * Abo Users
  * Broadcast users to see if new ones exist
  * */
-$app->get('/users', $ipAuth ,function() use ($app) {
+$app->get('/users', 'APIrequest', $ipAuth ,function() use ($app) {
 
     $abo   = new Abo();
 
@@ -142,9 +269,9 @@ $app->get('/users', $ipAuth ,function() use ($app) {
  * Abo User
  * Get one user by numero
  * */
-$app->get('/user/:numero', $ipAuth ,function($numero) use ($app) {
+$app->get('/user/:numero', 'APIrequest', $ipAuth ,function($numero) use ($app) {
 
-    $abo  = new Abo();
+    $abo  = new Service\Abo();
 
     $user = $abo->getUser($numero);
 
@@ -158,7 +285,7 @@ $app->get('/user/:numero', $ipAuth ,function($numero) use ($app) {
  * Authenticate User
  * By email and password
  * */
-$app->get('/auth/:email/:password', $ipAuth ,function($email,$password) use ($app) {
+$app->get('/auth/:email/:password', 'APIrequest', $ipAuth ,function($email,$password) use ($app) {
 
     $auth  = new Auth();
 

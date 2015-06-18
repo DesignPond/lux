@@ -1,4 +1,6 @@
-<?php
+<?php namespace Models;
+
+use Models\User;
 
 class Auth{
 

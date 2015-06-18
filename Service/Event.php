@@ -1,4 +1,8 @@
-<?php
+<?php namespace Service;
+
+use Models\Colloque;
+use Models\Price;
+use Models\File;
 
 class Event{
 
