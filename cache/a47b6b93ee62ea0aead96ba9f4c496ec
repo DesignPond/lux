@@ -68,9 +68,29 @@
         </form>
 
         <?php
+
+/*      echo '<pre>';
+        print_r($inserted);
+        echo '</pre>';
+;*/
         echo '<pre>';
         print_r($results);
         echo '</pre>';
+
+        echo 'adresse';
+        echo '<pre>';
+        print_r($adresses);
+        echo '</pre>';
+        echo 'inserted';
+        echo '<pre>';
+        print_r($inserted);
+        echo '</pre>';
+
+/*      foreach($adresses['has'] as $has){
+            echo $has['uid'].'<br/>';
+        }*/
+
+
         ?>
 
     </div>

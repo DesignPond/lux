@@ -104,11 +104,14 @@ $app->get('/add', function() use ($app) {
 
 $app->map('/upload', function() use ($app) {
 
-    $results = array();
-    $users   = array();
+    $results  = array();
+    $users    = array();
+    $adresses = array();
+    $inserted = array();
 
     $reader  = new \App\Service\Reader();
     $search  = new \App\Service\Search();
+    $adresse = new \App\Service\SearchAdresse();
 
     $specialisation = new \App\Models\Specialisation();
     $membre         = new \App\Models\Membre();
@@ -128,14 +131,24 @@ $app->map('/upload', function() use ($app) {
 
     if(isset($_FILES['file']))
     {
-        $results = $reader->uploadFile()->readFile();
-        $users   = $search->search($results);
+        $results  = $reader->uploadFile()->readFile();
+        $users    = $search->search($results);
+
+        if(isset($users['notfound'])){
+           $adresses = $adresse->search($users['notfound']);
+        }
+
+        if(isset($adresses['notfound'])){
+            $inserted = $adresse->addUser($adresses['notfound'],70);
+        }
     }
 
     $data = array(
         'request_uri'     => $_SERVER['REQUEST_URI'],
         'upload_uri'      => 'doUpload',
         'results'         => $users,
+        'adresses'        => $adresses,
+        'inserted'        => $inserted,
         'specialisations' => $specialisations,
         'membres'         => $membres
     );
@@ -150,6 +163,33 @@ $app->get('/read', function() use ($app) {
     $data = array();
 
     $app->render('read.php',$data);
+
+});
+
+$app->get('/addUser', function() use ($app) {
+
+    $search = new \App\Service\SearchAdresse();
+
+    $data = array(
+        '1'  => '1',
+        '2'  => 'Alexandra',
+        '3'  => 'HAENER',
+        '4'  => 'alexandra.haener@bobst.com',
+        '5'  => 'Bobst Group SA',
+        '6'  => '',
+        '7'  => '',
+        '8'  => '',
+        '9'  => 'Route de Faraz 3',
+        '10' => '',
+        '11' => '1031',
+        '12' => 'Mex'
+    );
+
+    $user = $search->addUser($data,70);
+
+    echo '<pre>';
+    print_r($user);
+    echo '</pre>';
 
 });
 

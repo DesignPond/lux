@@ -1,9 +1,8 @@
 <?php namespace App\Service;
 
-use App\Models\User;
 use App\Models\Address;
 
-class Search{
+class SearchAdresse{
 
     protected $user;
     public  $specialisation;
@@ -12,7 +11,7 @@ class Search{
 
     public function __construct()
     {
-        $this->user    = new User();
+        $this->user    = new Address();
         $this->specialisation = null;
         $this->membre  = null;
         $this->reader  = new \App\Service\Reader();
@@ -134,11 +133,48 @@ class Search{
 
         if(!in_array($specialisation,$specs))
         {
-            $theuser->specialisation()->attach($specialisation, array('refUser' => $user));
+            $theuser->specialisation()->attach($specialisation, array('refUser' => 0,'refUserAdresse' => $user));
         }
 
         return true;
-
     }
 
+    /**
+     *  Add one user
+     */
+    public function addUser($datas,$specialisation = null){
+
+        if(!empty($datas))
+        {
+            foreach($datas as $data)
+            {
+                $one = new Address();
+
+                $one->gender      = (isset($data[1]) && !empty($data[1]) ? $data[1] : '');
+                $one->tstamp      = time();
+                $one->pid         = 44;
+                $one->first_name  = (isset($data[2]) && !empty($data[2]) ? $data[2] : '');
+                $one->last_name   = (isset($data[3]) && !empty($data[3]) ? $data[3] : '');
+                $one->email       = (isset($data[4]) && !empty($data[4]) ? $data[4] : '');
+                $one->name        = (isset($data[2]) && !empty($data[2]) && isset($data[3]) && !empty($data[3]) ? $data[2].' '.$data[3] : '');
+                $one->company     = (isset($data[5]) && !empty($data[5]) ? $data[5] : '');
+                $one->address     = (isset($data[9]) && !empty($data[9]) ? $data[9] : '');
+                $one->tx_feext_cp = (isset($data[10]) && !empty($data[10]) ? $data[10] : '');
+                $one->zip         = (isset($data[11]) && !empty($data[11]) ? $data[11] : '');
+                $one->city        = (isset($data[12]) && !empty($data[12]) ? $data[12] : '');
+
+                $one->save();
+
+                if($specialisation)
+                {
+                    $this->addSpecialisation($one->id, $specialisation);
+                }
+
+                $ids[] = $one->id;
+            }
+        }
+
+        return $ids;
+    }
+    
 }
