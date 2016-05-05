@@ -54,9 +54,15 @@ function APIrequest(){
 
 $ipAuth = function() use ($app)
 {
-    $granted = array('194.126.200.59','127.0.0.1','130.125.41.184','178.192.238.140');
+    $granted = array('194.126.200.59','127.0.0.1','130.125.41.184','178.192.238.140','::1');
 
-    if(!in_array($_SERVER['REMOTE_ADDR'],$granted))
+    if(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ip_address = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    } else {
+        $ip_address = $_SERVER['REMOTE_ADDR'];
+    }
+
+    if(!in_array($ip_address,$granted))
     {
         return $app->redirect('/denied');
     }
